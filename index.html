@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD SAJID // AURA PERSONAL PORTAL</title>
+    <meta name="description" content="MD SAJID — personal identity portal, projects, technology interests and RED-BEAST hardware setup.">
+    <meta name="theme-color" content="#080812">
+    <meta property="og:title" content="MD SAJID // AURA PERSONAL PORTAL">
+    <meta property="og:description" content="A personal portal built around technology, creativity and a signature Aura identity.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Space+Grotesk:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+            user-select: none;
+        }
+        .mono {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* Background Styling */
+        #media-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+            background-color: #050508;
+        }
+        .bg-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.85) contrast(1.1);
+        }
+        .overlay-dark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, rgba(5,5,8,0.15) 0%, rgba(5,5,8,0.75) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphic Elements */
+        .glass-panel {
+            background: rgba(10, 13, 22, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+        
+        .glass-panel:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.15);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        .glow-accent {
+            text-shadow: 0 0 12px rgba(99, 102, 241, 0.8);
+        }
+
+        /* Dynamic Hover Magnification for Icons */
+        .social-icon-btn {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+        }
+        .social-icon-btn:hover {
+            transform: scale(1.45) translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+            border-color: rgba(255, 255, 255, 0.4);
+            z-index: 30;
+        }
+
+        /* Tooltip style */
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: translateY(5px);
+        }
+        .social-icon-btn:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 4px;
+        }
+
+        #entry-screen {
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+        }
+        .entered #entry-screen {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+
+        /* AURA signature system */
+        :root { --aura: 129, 110, 255; --aura-2: 89, 67, 220; }
+        .aura-card {
+            position: relative; isolation: isolate; overflow: hidden;
+            background: linear-gradient(135deg, rgba(var(--aura),.14), rgba(10,13,22,.72) 55%, rgba(var(--aura-2),.12));
+            border: 1px solid rgba(var(--aura),.38);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 12px 36px rgba(var(--aura-2),.12);
+        }
+        .aura-card::before {
+            content: ''; position: absolute; inset: -70% -30%; z-index: -1;
+            background: conic-gradient(from 0deg, transparent, rgba(var(--aura),.13), transparent 28%);
+            animation: aura-orbit 16s linear infinite;
+        }
+        .aura-emblem {
+            display: grid; place-items: center; flex: 0 0 auto; width: 52px; height: 52px;
+            border-radius: 17px; color: #fff; border: 1px solid rgba(var(--aura),.65);
+            background: radial-gradient(circle at 35% 20%, rgba(var(--aura),.42), rgba(15,12,35,.8) 70%);
+            box-shadow: 0 0 24px rgba(var(--aura),.18), inset 0 0 14px rgba(var(--aura),.12);
+        }
+        .aura-label { color: rgb(var(--aura)); text-shadow: 0 0 16px rgba(var(--aura),.55); letter-spacing: .16em; }
+        .aura-chip { border: 1px solid rgba(var(--aura),.4); background: rgba(var(--aura),.10); color: rgb(var(--aura)); }
+        .aura-action { border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.045); transition: .2s ease; }
+        .aura-action:hover, .aura-action:focus-visible { border-color: rgba(var(--aura),.65); background: rgba(var(--aura),.12); outline: none; }
+        .project-card { transition: transform .25s ease, border-color .25s ease, background .25s ease; }
+        .project-card:hover { transform: translateY(-4px); border-color: rgba(var(--aura),.4); background: rgba(var(--aura),.06); }
+        .theme-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px currentColor; }
+        @keyframes aura-orbit { to { transform: rotate(360deg); } }
+        @keyframes aura-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(var(--aura),.12); } 50% { box-shadow: 0 0 0 7px rgba(var(--aura),0); } }
+        .aura-pulse { animation: aura-pulse 3s ease-in-out infinite; }
+        @media (max-width: 640px) {
+            .hud-controls { justify-content: flex-start; flex-wrap: wrap; }
+            #live-clock { display: none; }
+            .social-icon-btn:hover { transform: scale(1.12) translateY(-2px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
+
+    </style>
+</head>
+<body class="bg-black text-gray-100 min-h-screen overflow-x-hidden relative flex flex-col justify-between">
+
+    <!-- DYNAMIC BACKGROUND (Supports PNG, JPG, GIF & MP4) -->
+    <div id="media-container">
+        <!-- Default Image / GIF Background -->
+        <img id="bg-img" class="bg-media" src="assets/background/bg.png" alt="Background" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920'">
+    </div>
+    <div class="overlay-dark"></div>
+
+    <!-- ENTRY OVERLAY / INITIALIZATION -->
+    <div id="entry-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl">
+        <div class="text-center p-8 max-w-md">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-500/10 border border-indigo-500/30 mb-6 glow-accent">
+                <i class="fa-solid fa-shield-halved text-3xl text-indigo-400"></i>
+            </div>
+            <h1 class="text-3xl font-black tracking-widest text-white glow-text mb-2">MD SAJID</h1>
+            <p class="mono text-xs text-indigo-400 tracking-widest uppercase mb-8">SECURE PERSONAL PORTAL</p>
+            
+            <button id="enter-btn" onclick="initWorkspace()" class="w-full py-4 px-8 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold tracking-wider transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-indigo-500/25 border border-indigo-400/30">
+                ENTER WORKSPACE
+            </button>
+        </div>
+    </div>
+
+    <!-- BACKGROUND AUDIO ENGINE WITH USER CONTROLS -->
+    <audio id="bg-audio" loop preload="auto">
+        <source src="assets/audio/bgm.mp3" type="audio/mpeg">
+        <source src="assets/audio/bgm.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- MAIN HUD LAYOUT -->
+    <div class="min-h-screen flex flex-col justify-between p-4 md:p-8 relative z-10 pointer-events-none">
+
+        <!-- TOP BAR HUD -->
+        <header class="flex justify-between items-center w-full pointer-events-auto">
+            <div class="glass-panel py-2 px-5 rounded-full flex items-center gap-3">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span class="mono text-xs tracking-wider text-gray-300">SYSTEM ONLINE</span>
+            </div>
+
+            <div class="glass-panel py-2 px-5 rounded-full mono text-xs text-gray-400 flex items-center gap-4">
+                <span id="location-tag"><i class="fa-solid fa-location-dot text-indigo-400 mr-1.5"></i>Pabna, BD</span>
+                <span class="text-gray-600">|</span>
+                <span id="live-clock">00:00:00</span>
+            </div>
+        </header>
+
+        <!-- MIDDLE SECTION (CLEAR CENTER AREA) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-center">
+            
+            <!-- LEFT DOCK: BIO & IDENTITY -->
+            <div class="lg:col-span-4 space-y-4 pointer-events-auto">
+                <div class="glass-panel p-6 rounded-3xl transition-all">
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="assets/images/profile.png" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Sajid'" class="w-16 h-16 rounded-2xl border border-indigo-500/30 object-cover shadow-inner" alt="Profile">
+                        <div>
+                            <h2 class="text-2xl font-bold tracking-tight text-white glow-text">MD SAJID</h2>
+                            <p class="mono text-xs text-indigo-400">@Sajid-mm</p>
+                            <div class="mt-2 inline-flex items-center gap-1.5 rounded-full px-2 py-1 aura-chip mono text-[9px] aura-pulse">
+                                <i class="fa-solid fa-bolt"></i><span>AURA SIGNATURE</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-4">
+                        Tech Enthusiast, Independent Developer & Hardware Tinkerer. Building custom tools, systems & exploring digital frontiers.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mono text-[11px]">
+                        <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300">#Developer</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300">#Hardware</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">#Gamer</span>
+                    </div>
+                </div>
+
+                <!-- SIGNATURE AURA IDENTITY -->
+                <section class="aura-card p-4 rounded-2xl" aria-label="Aura identity">
+                    <div class="flex items-center gap-3">
+                        <div class="aura-emblem aura-pulse" aria-hidden="true"><i class="fa-solid fa-sparkles text-xl"></i></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="mono text-[9px] tracking-[.2em] text-gray-400">PERSONAL IDENTITY</div>
+                            <div class="text-lg font-black aura-label leading-tight">AURA <span class="text-white">∞</span></div>
+                            <div class="text-[11px] text-gray-300">Own your identity. Build your own path.</div>
+                        </div>
+                        <span class="mono text-[9px] text-gray-400 self-start">01</span>
+                    </div>
+                </section>
+
+                <!-- QUICK RIG OVERVIEW BUTTON -->
+                <button onclick="toggleSpecs()" class="w-full glass-panel p-4 rounded-2xl flex items-center justify-between text-left hover:bg-indigo-950/20 transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-white">RED-BEAST RIG</div>
+                            <div class="mono text-xs text-gray-400">System Hardware Specs</div>
+                        </div>
+                    </div>
+                    <i id="specs-chevron" class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+            </div>
+
+            <!-- CENTER CLEAR SPACE (Preserving background image center view) -->
+            <div class="hidden lg:block lg:col-span-5 min-h-[300px]"></div>
+
+            <!-- RIGHT DOCK: EXPANDABLE COMPACT ICON DOCK FOR SOCIAL LINKS -->
+            <div class="lg:col-span-3 space-y-3 pointer-events-auto flex flex-col items-end">
+                <div class="glass-panel p-4 rounded-3xl w-full max-w-[280px]">
+                    <div class="mono text-[11px] text-indigo-400 tracking-wider uppercase mb-3 text-center border-b border-white/10 pb-2">
+                        SOCIAL NETWORKS
+                    </div>
+                    
+                    <!-- COMPACT HOVER MAGNIFICATION DOCK -->
+                    <div id="social-dock" class="flex flex-wrap justify-center gap-3 py-1">
+
+                        <!-- GitHub -->
+                        <a href="" target="_blank" data-link="github" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-white hover:bg-indigo-600 hover:text-white">
+                            <i class="fa-brands fa-github"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">GitHub</span>
+                        </a>
+
+                        <!-- Chess.com -->
+                        <a href="" target="_blank" data-link="chess" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-amber-400 hover:bg-amber-600 hover:text-white">
+                            <i class="fa-solid fa-chess"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Chess.com</span>
+                        </a>
+
+                        <!-- Facebook -->
+                        <a href="https://www.facebook.com/PrinceSajidOfficial136" target="_blank" data-link="facebook" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-blue-400 hover:bg-blue-600 hover:text-white">
+                            <i class="fa-brands fa-facebook-f"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Facebook</span>
+                        </a>
+
+                        <!-- Email -->
+                        <a href="mailto:x@sajidx.cyou" data-link="email" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-rose-400 hover:bg-rose-600 hover:text-white">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Email</span>
+                        </a>
+
+                        <!-- Discord -->
+                        <a href="" target="_blank" data-link="discord" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-indigo-400 hover:bg-indigo-500 hover:text-white">
+                            <i class="fa-brands fa-discord"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Discord</span>
+                        </a>
+
+                        <!-- YouTube -->
+                        <a href="" target="_blank" data-link="youtube" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-red-500 hover:bg-red-600 hover:text-white">
+                            <i class="fa-brands fa-youtube"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">YouTube</span>
+                        </a>
+
+                        <!-- Instagram -->
+                        <a href="" target="_blank" data-link="instagram" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-pink-400 hover:bg-pink-600 hover:text-white">
+                            <i class="fa-brands fa-instagram"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Instagram</span>
+                        </a>
+
+                        <!-- Telegram -->
+                        <a href="" target="_blank" data-link="telegram" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-sky-400 hover:bg-sky-500 hover:text-white">
+                            <i class="fa-brands fa-telegram"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Telegram</span>
+                        </a>
+
+                        <!-- WhatsApp -->
+                        <a href="https://wa.me/+8801732161779" target="_blank" data-link="whatsapp" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-emerald-400 hover:bg-emerald-600 hover:text-white">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">WhatsApp</span>
+                        </a>
+
+                        <!-- Steam -->
+                        <a href="" target="_blank" data-link="steam" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-slate-300 hover:bg-slate-700 hover:text-white">
+                            <i class="fa-brands fa-steam"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">Steam</span>
+                        </a>
+
+                        <!-- LinkedIn -->
+                        <a href="" target="_blank" data-link="linkedin" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-blue-500 hover:bg-blue-700 hover:text-white">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">LinkedIn</span>
+                        </a>
+
+                        <!-- X / Twitter -->
+                        <a href="" target="_blank" data-link="twitter" class="social-icon-btn relative w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-gray-200 hover:bg-neutral-800 hover:text-white">
+                            <i class="fa-brands fa-x-twitter"></i>
+                            <span class="tooltip absolute bottom-full mb-2 px-2.5 py-1 rounded-lg bg-black/90 text-[10px] mono text-white whitespace-nowrap border border-white/10 pointer-events-none">X / Twitter</span>
+                        </a>
+
+                    </div>
+                </div>
+                <section class="glass-panel p-4 rounded-2xl w-full max-w-[280px]" aria-label="Portal controls">
+                    <div class="mono text-[10px] text-indigo-300 tracking-wider uppercase mb-3 flex items-center gap-2"><i class="fa-solid fa-sliders"></i> PORTAL CONTROLS</div>
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <label for="theme-select" class="text-xs text-gray-300">Aura theme</label>
+                        <select id="theme-select" class="aura-action rounded-lg px-2 py-1.5 text-xs text-white bg-[#10101b]" aria-label="Choose aura theme">
+                            <option value="violet">Violet</option><option value="cyan">Cyber Cyan</option><option value="gold">Solar Gold</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="audio-toggle" type="button" class="aura-action rounded-xl px-3 py-2 text-xs text-gray-200 flex items-center gap-2 flex-1" aria-pressed="false"><i id="audio-icon" class="fa-solid fa-volume-high"></i><span id="audio-label">Music on</span></button>
+                        <button id="copy-profile" type="button" class="aura-action rounded-xl px-3 py-2 text-xs text-gray-200 flex items-center gap-2" title="Copy profile link"><i class="fa-solid fa-link"></i><span>Copy link</span></button>
+                    </div>
+                    <label for="volume-control" class="flex items-center justify-between text-[10px] text-gray-400 mt-3 mb-1"><span>VOLUME</span><span id="volume-value">60%</span></label>
+                    <input id="volume-control" type="range" min="0" max="100" value="60" class="w-full accent-indigo-400" aria-label="Music volume">
+                    <p id="control-feedback" class="mono text-[9px] text-gray-500 mt-2" role="status" aria-live="polite">SYSTEM READY // PERSONALIZED</p>
+                </section>
+            </div>
+        </div>
+
+        <!-- PROJECT VAULT -->
+        <section id="project-vault" class="pointer-events-auto glass-panel rounded-3xl p-5 md:p-6 mb-6" aria-labelledby="vault-title">
+            <div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+                <div>
+                    <div class="mono text-[10px] tracking-[.2em] text-indigo-300 mb-1">SELECTED WORK / PERSONAL ARCHIVE</div>
+                    <h2 id="vault-title" class="text-xl md:text-2xl font-black text-white">PROJECT <span class="aura-label">VAULT</span></h2>
+                </div>
+                <span class="mono text-[10px] text-gray-500">MORE BUILDS COMING</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <article class="project-card rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="flex items-center justify-between mb-3"><span class="aura-emblem !w-9 !h-9 !rounded-xl"><i class="fa-solid fa-window-maximize"></i></span><span class="mono text-[9px] text-gray-500">01 / WEB</span></div>
+                    <h3 class="font-bold text-white mb-1">Personal Portal</h3><p class="text-xs leading-relaxed text-gray-400">A custom identity website with glass UI, live clock, social dock and Aura styling.</p>
+                    <span class="inline-block mt-3 mono text-[9px] aura-label">IN PROGRESS</span>
+                </article>
+                <article class="project-card rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="flex items-center justify-between mb-3"><span class="aura-emblem !w-9 !h-9 !rounded-xl"><i class="fa-solid fa-microchip"></i></span><span class="mono text-[9px] text-gray-500">02 / RIG</span></div>
+                    <h3 class="font-bold text-white mb-1">RED-BEAST Setup</h3><p class="text-xs leading-relaxed text-gray-400">A dedicated showcase for PC hardware, setup details and future build upgrades.</p>
+                    <span class="inline-block mt-3 mono text-[9px] text-emerald-300">HARDWARE PROFILE</span>
+                </article>
+                <article class="project-card rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div class="flex items-center justify-between mb-3"><span class="aura-emblem !w-9 !h-9 !rounded-xl"><i class="fa-solid fa-code"></i></span><span class="mono text-[9px] text-gray-500">03 / LAB</span></div>
+                    <h3 class="font-bold text-white mb-1">Digital Lab</h3><p class="text-xs leading-relaxed text-gray-400">A home for custom tools, experiments and small utilities as they are published.</p>
+                    <span class="inline-block mt-3 mono text-[9px] text-amber-300">EXPLORING</span>
+                </article>
+            </div>
+        </section>
+
+        <!-- HARDWARE MODAL -->
+        <div id="specs-modal" class="hidden pointer-events-auto transition-all duration-300 mb-4">
+            <div class="glass-panel p-6 rounded-3xl max-w-4xl mx-auto border border-indigo-500/30">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-white/10">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-desktop text-indigo-400"></i>
+                        <h3 class="font-bold text-white text-lg">RED-BEAST // HARDWARE SPECIFICATIONS</h3>
+                    </div>
+                    <button onclick="toggleSpecs()" class="text-gray-400 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mono text-xs">
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">PROCESSOR</div>
+                        <div class="text-white font-semibold">AMD Ryzen 5 7500F</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">GRAPHICS</div>
+                        <div class="text-white font-semibold">MSI RTX 3060 12GB</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">MEMORY</div>
+                        <div class="text-white font-semibold">16GB DDR5 6000MHz</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">MOTHERBOARD</div>
+                        <div class="text-white font-semibold">ASUS Prime B650M-A II</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">COOLER</div>
+                        <div class="text-white font-semibold">DeepCool AK500</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">DISPLAY</div>
+                        <div class="text-white font-semibold">ASUS VY249HGR 120Hz</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">CHASSIS</div>
+                        <div class="text-white font-semibold">PC Power Ice Cube V2</div>
+                    </div>
+                    <div class="bg-white/5 p-3.5 rounded-xl border border-white/5">
+                        <div class="text-gray-400 mb-1">AUDIO</div>
+                        <div class="text-white font-semibold">Rapoo VH360 7.1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER DOCK -->
+        <footer class="flex justify-between items-center w-full pointer-events-auto pt-2 border-t border-white/5">
+            <div class="mono text-[11px] text-gray-400">
+                &copy; <span id="year">2026</span> MD SAJID. ALL RIGHTS RESERVED.
+            </div>
+            <div class="mono text-[11px] text-gray-500">
+                POWERED BY GITHUB PAGES
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- SCRIPT ENGINE -->
+    <script>
+        // Automatic Empty Social Links Hiding Logic
+        document.addEventListener("DOMContentLoaded", function() {
+            const socialLinks = document.querySelectorAll('#social-dock a');
+            socialLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href || href.trim() === "" || href.trim() === "#") {
+                    link.style.display = 'none';
+                } else {
+                    link.style.display = 'flex';
+                }
+            });
+        });
+
+        // System Initialization & Secret Audio Launcher
+        function initWorkspace() {
+            document.body.classList.add('entered');
+            workspaceEntered = true;
+            if (audio) {
+                audio.volume = Number(volumeControl.value) / 100;
+                audio.play().then(() => {
+                    controlFeedback.textContent = 'AUDIO PLAYING';
+                    syncAudioUI();
+                }).catch(() => {
+                    controlFeedback.textContent = 'AUDIO READY // USE MUSIC CONTROL';
+                    syncAudioUI();
+                });
+            }
+        }
+
+        // Hardware Specs Toggle
+        function toggleSpecs() {
+            const modal = document.getElementById('specs-modal');
+            const chevron = document.getElementById('specs-chevron');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                modal.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+
+
+
+        // Aura themes keep the signature identity while allowing a personal accent.
+        const auraThemes = {
+            violet: { main: '129, 110, 255', secondary: '89, 67, 220', tailwind: 'indigo' },
+            cyan: { main: '34, 211, 238', secondary: '8, 145, 178', tailwind: 'cyan' },
+            gold: { main: '245, 190, 82', secondary: '180, 112, 24', tailwind: 'amber' }
+        };
+        const themeSelect = document.getElementById('theme-select');
+        function setAuraTheme(name) {
+            const theme = auraThemes[name] || auraThemes.violet;
+            document.documentElement.style.setProperty('--aura', theme.main);
+            document.documentElement.style.setProperty('--aura-2', theme.secondary);
+            try { localStorage.setItem('sajid-aura-theme', name); } catch (_) {}
+        }
+        themeSelect.addEventListener('change', () => setAuraTheme(themeSelect.value));
+        try {
+            const savedTheme = localStorage.getItem('sajid-aura-theme');
+            if (savedTheme && auraThemes[savedTheme]) themeSelect.value = savedTheme;
+        } catch (_) {}
+        setAuraTheme(themeSelect.value);
+
+        // Visible, accessible music controls; the entry click remains the audio permission gesture.
+        const audio = document.getElementById('bg-audio');
+        const audioToggle = document.getElementById('audio-toggle');
+        const audioIcon = document.getElementById('audio-icon');
+        const audioLabel = document.getElementById('audio-label');
+        const volumeControl = document.getElementById('volume-control');
+        const volumeValue = document.getElementById('volume-value');
+        const controlFeedback = document.getElementById('control-feedback');
+        let workspaceEntered = false;
+        function syncAudioUI() {
+            const playing = !audio.paused && !audio.muted && audio.volume > 0;
+            audioToggle.setAttribute('aria-pressed', String(playing));
+            audioIcon.className = playing ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+            audioLabel.textContent = playing ? 'Music on' : 'Music off';
+        }
+        audioToggle.addEventListener('click', async () => {
+            if (!audio.paused && !audio.muted && audio.volume > 0) {
+                audio.pause();
+                controlFeedback.textContent = 'AUDIO PAUSED';
+            } else {
+                try {
+                    audio.muted = false;
+                    if (audio.volume === 0) audio.volume = Math.max(0.01, Number(volumeControl.value) / 100 || 0.6);
+                    await audio.play();
+                    controlFeedback.textContent = 'AUDIO PLAYING';
+                } catch (_) {
+                    controlFeedback.textContent = 'PRESS ENTER WORKSPACE TO ENABLE AUDIO';
+                }
+            }
+            syncAudioUI();
+        });
+        volumeControl.addEventListener('input', () => {
+            audio.volume = Number(volumeControl.value) / 100;
+            volumeValue.textContent = `${volumeControl.value}%`;
+            if (audio.volume === 0) audio.pause();
+            syncAudioUI();
+        });
+        audio.addEventListener('play', syncAudioUI);
+        audio.addEventListener('pause', syncAudioUI);
+
+        // Copy the current page URL without assuming a hosted domain.
+        document.getElementById('copy-profile').addEventListener('click', async () => {
+            const feedback = document.getElementById('control-feedback');
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                feedback.textContent = 'PROFILE LINK COPIED';
+            } catch (_) {
+                feedback.textContent = 'COPY UNAVAILABLE IN THIS BROWSER';
+            }
+        });
+
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+                document.getElementById('live-clock').innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+        document.getElementById('year').textContent = new Date().getFullYear();
+        syncAudioUI();
+    </script>
+</body>
+</html>
